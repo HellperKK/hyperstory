@@ -29,6 +29,7 @@ story-scene.active {
 
 story-choice {
   cursor: pointer;
+  color: #4d53d1;
 }
 
 story-pre {
