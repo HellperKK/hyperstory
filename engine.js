@@ -26,7 +26,7 @@ const $state = new Proxy(
   }
 );
 
-class EngineStory extends HTMLDivElement {
+class EngineRoot extends HTMLDivElement {
   constructor() {
     super();
 
@@ -44,6 +44,12 @@ class EngineStory extends HTMLDivElement {
 
   next(id) {
     const nextPage = this.querySelector(`story-scene[page-id="${id}"]`);
+
+    if (!nextPage) {
+      console.error(`No page with id ${id}`);
+      return;
+    }
+
     this.currentPage.deactivate();
     nextPage.activate();
     this.currentPage = nextPage;
@@ -146,4 +152,4 @@ customElements.define("story-data", EngineData, { extends: "span" });
 customElements.define("story-choice", EngineLink, { extends: "button" });
 customElements.define("story-scene", EnginePage, { extends: "div" });
 customElements.define("story-category", EngineCategory, { extends: "div" });
-customElements.define("story-root", EngineStory, { extends: "div" });
+customElements.define("story-root", EngineRoot, { extends: "div" });
