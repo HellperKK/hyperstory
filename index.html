@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="engine.js" defer></script>
+    <link rel="stylesheet" href="style.css" />
+    <title>My Story</title>
+  </head>
+  <body>
+    <story-root>
+      <story-category name="Introduction">
+        <story-scene start page-id="1">
+          What is your favorite dessert?
+          <br>
+          <story-choice to="2">Cheesecake</story-choice>
+          <story-choice to="3">Vanilla ice cream</story-choice>
+          <story-choice to="4">Brownie</story-choice>
+        </story-scene>
+        <story-scene page-id="2">
+          You chose the best dessert and desserve to be my friend!
+          <story-choice to="1">Go back</story-choice>
+        </story-scene>
+        <story-scene page-id="3">
+          Quite classical I must say...
+          <story-choice to="1">Go back</story-choice>
+        </story-scene>
+        <story-scene page-id="4">
+          I guess you're not counting your calories?
+          <story-choice to="1">Go back</story-choice>
+        </story-scene>
+      </story-category>
+    </story-root>
+  </body>
+</html>
