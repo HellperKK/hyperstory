@@ -16,7 +16,6 @@ const $state = new Proxy(
       }
       for (const computed of computeds) {
         if (computed.dependencies.includes(key)) {
-          console.log(value, computed.callback(value), $state);
           $state[computed.name] = computed.callback(value);
         }
       }
@@ -89,11 +88,9 @@ class EngineLink extends HTMLButtonElement {
         dependencies: [iff],
         callback: (value) => {
           if (value) {
-            console.log("visible");
             this.classList.remove("hidden");
           }
           else {
-            console.log("hidden");
             this.classList.add("hidden");
           }
         },
