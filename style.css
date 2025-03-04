@@ -34,3 +34,7 @@ story-choice {
 story-pre {
   white-space: pre-wrap;
 }
+
+.hidden {
+  display: none;
+}

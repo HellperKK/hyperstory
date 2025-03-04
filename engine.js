@@ -1,4 +1,8 @@
 const signals = [];
+const computeds = [];
+
+const addSignal = (dependencies, callback) => signals.push({ dependencies, callback });
+const addComputed = (dependencies, callback, name) => computeds.push({ dependencies, callback, name });
 
 const $state = new Proxy(
   {},
@@ -8,6 +12,11 @@ const $state = new Proxy(
       for (const signal of signals) {
         if (signal.dependencies.includes(key)) {
           signal.callback(value);
+        }
+      }
+      for (const computed of computeds) {
+        if (computed.dependencies.includes(key)) {
+          target[computed.name] = computed.callback(value);
         }
       }
       target[key] = value;
@@ -63,6 +72,24 @@ class EnginePage extends HTMLDivElement {
 class EngineLink extends HTMLButtonElement {
   constructor() {
     super();
+
+    const iff = this.getAttribute("if");
+    if (iff && !$state[iff]) {
+      this.classList.add("hidden");
+    }
+    if (iff) {
+      signals.push({
+        dependencies: [iff],
+        callback: (value) => {
+          if (value) {
+            this.classList.remove("hidden");
+          }
+          else {
+            this.classList.add("hidden");
+          }
+        },
+      });
+    }
   }
 
   connect(callback) {
@@ -96,10 +123,10 @@ class EngineInput extends HTMLElement {
     super();
     this.input = document.createElement("input");
     this.input.type = this.getAttribute("type");
-    this.input.placeholder = this.getAttribute("placeholder");
+    this.input.placeholder = this.getAttribute("placeholder") ?? "";
 
     const name = this.getAttribute("name");
-    this.input.value = $state[name] || "";
+    this.input.value = $state[name] ?? "";
     this.input.addEventListener("input", (event) => {
       $state[name] = event.target.value;
     });
