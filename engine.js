@@ -9,6 +9,7 @@ const $state = new Proxy(
   {
     get: (target, key) => target[key] || "",
     set: (target, key, value) => {
+      target[key] = value;
       for (const signal of signals) {
         if (signal.dependencies.includes(key)) {
           signal.callback(value);
@@ -16,10 +17,10 @@ const $state = new Proxy(
       }
       for (const computed of computeds) {
         if (computed.dependencies.includes(key)) {
-          $state[computed.name] = computed.callback(value);
+          const values = computed.dependencies.map((dep) => target[dep]);
+          $state[computed.name] = computed.callback(...values);
         }
       }
-      target[key] = value;
       return true;
     },
   }
