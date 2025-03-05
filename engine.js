@@ -147,9 +147,6 @@ class EngineInput extends HTMLElement {
 
     this.appendChild(this.input);
   }
-
-  connectedCallback() {
-  }
 }
 
 customElements.define("story-input", EngineInput);
