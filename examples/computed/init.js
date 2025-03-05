@@ -1,1 +1,1 @@
-addComputed(["number"], (value) => value == 42, "isNumberRight");
+addComputed(["number"], (number) => number == 42, "isNumberRight");
