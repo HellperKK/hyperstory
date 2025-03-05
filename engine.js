@@ -124,6 +124,28 @@ class EngineData extends HTMLSpanElement {
   }
 }
 
+class EngineIf extends HTMLSpanElement {
+  constructor() {
+    super();
+    const iff = this.getAttribute("if");
+    console.log(iff, $state[iff]);
+    if (!$state[iff]) {
+      this.classList.add("hidden");
+    }
+
+    signals.push({
+      dependencies: [iff],
+      callback: (value) => {
+        if (value) {
+          this.classList.remove("hidden");
+        } else {
+          this.classList.add("hidden");
+        }
+      },
+    });
+  }
+}
+
 class EngineCategory extends HTMLDivElement {
   constructor() {
     super();
@@ -155,6 +177,7 @@ class EngineInput extends HTMLElement {
 }
 
 customElements.define("story-input", EngineInput);
+customElements.define("story-if", EngineIf, { extends: "span" });
 customElements.define("story-data", EngineData, { extends: "span" });
 customElements.define("story-choice", EngineLink, { extends: "button" });
 customElements.define("story-scene", EnginePage, { extends: "div" });
