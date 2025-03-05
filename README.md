@@ -24,3 +24,6 @@ A special input that will save its content inside a state, pointed by the `key` 
 
 ### story-data
 A compontent that will dynamically retreive the content of a state, pointed by the `key` property.
+
+### story-if
+A component that only display depending of the state, pointed by the `if` proprety.
