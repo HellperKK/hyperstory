@@ -1,8 +1,10 @@
 const signals = [];
 const computeds = [];
 
-const addSignal = (dependencies, callback) => signals.push({ dependencies, callback });
-const addComputed = (dependencies, callback, name) => computeds.push({ dependencies, callback, name });
+const addSignal = (dependencies, callback) =>
+  signals.push({ dependencies, callback });
+const addComputed = (dependencies, callback, name) =>
+  computeds.push({ dependencies, callback, name });
 
 const $state = new Proxy(
   {},
