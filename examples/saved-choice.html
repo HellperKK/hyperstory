@@ -14,7 +14,7 @@
         <story-scene start page-id="1">
           Choose black or white.
           <story-if if="color">
-            Last choice <story-data name="color"/>
+            Last choice: <story-data name="color"/>
           </story-if>
           <br />
           <story-choice to="2" onclick="$state.color = 'black'">Black</story-choice>
