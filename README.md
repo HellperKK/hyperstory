@@ -17,7 +17,7 @@ One scene can also have the `start` flag, which it set it as the scene to stat t
 A link to switch between scene. It has a property `to` which indicates the scene to go to. A choice can haxe an `if` property with a name; In that case, the choice will only be available when the correspondig state is truthy.
 
 ### story-category
-A container for a list of pages. It does nothing on its own but is usefull for hiding its content when working on editors such as vscode.
+A container for a list of pages. It does nothing on its own but is useful for hiding its content when working in editors such as vscode.
 
 ### story-input
 A special input that will save its content inside a state, pointed by the `key` property.
