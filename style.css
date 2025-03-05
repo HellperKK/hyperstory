@@ -27,9 +27,11 @@ story-scene.active {
   display: block;
 }
 
-story-choice {
+story-choice > button {
   cursor: pointer;
   color: #4d53d1;
+  border: none;
+  background-color: transparent;
 }
 
 story-pre {

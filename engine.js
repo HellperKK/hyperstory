@@ -80,6 +80,12 @@ class EngineLink extends HTMLButtonElement {
   constructor() {
     super();
 
+    const button = document.createElement("button");
+    const text = this.innerText;
+    this.innerText = "";
+    button.innerText = text;
+    this.appendChild(button);
+
     const iff = this.getAttribute("if");
     if (iff && !$state[iff]) {
       this.classList.add("hidden");
@@ -90,8 +96,7 @@ class EngineLink extends HTMLButtonElement {
         callback: (value) => {
           if (value) {
             this.classList.remove("hidden");
-          }
-          else {
+          } else {
             this.classList.add("hidden");
           }
         },
