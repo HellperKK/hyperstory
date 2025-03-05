@@ -138,6 +138,13 @@ class EngineInput extends HTMLElement {
       $state[name] = event.target.value;
     });
 
+    signals.push({
+      dependencies: [name],
+      callback: (value) => {
+        this.input.value = value;
+      },
+    });
+
     this.appendChild(this.input);
   }
 
