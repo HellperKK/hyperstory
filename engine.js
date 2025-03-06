@@ -58,7 +58,7 @@ class EngineRoot extends HTMLDivElement {
   }
 }
 
-class EnginePage extends HTMLDivElement {
+class EngineScene extends HTMLDivElement {
   constructor() {
     super();
   }
@@ -78,7 +78,7 @@ class EnginePage extends HTMLDivElement {
   }
 }
 
-class EngineLink extends HTMLButtonElement {
+class EngineChoice extends HTMLButtonElement {
   constructor() {
     super();
 
@@ -181,7 +181,7 @@ class EngineInput extends HTMLElement {
 customElements.define("story-input", EngineInput);
 customElements.define("story-if", EngineIf, { extends: "span" });
 customElements.define("story-data", EngineData, { extends: "span" });
-customElements.define("story-choice", EngineLink, { extends: "button" });
-customElements.define("story-scene", EnginePage, { extends: "div" });
+customElements.define("story-choice", EngineChoice, { extends: "button" });
+customElements.define("story-scene", EngineScene, { extends: "div" });
 customElements.define("story-category", EngineCategory, { extends: "div" });
 customElements.define("story-root", EngineRoot, { extends: "div" });
