@@ -9,7 +9,7 @@ Hyperstory provides en set a custom html elements to help building interractives
 The root of the story in which you will add a list of scene and will manage whiche one is currently displayed.
 
 ### story-scene
-The container for a part of the sorty, as there is only one scene displayed at a time. It has one property `id` which is used by `story-choice` to switch between scenes.
+The container for a part of the sorty, as there is only one scene displayed at a time. It has one property `id` which is used by `story-choice` to switch between scenes. An id can be any text as long as it is unique.
 
 One scene can also have the `start` flag, which it set it as the scene to stat the game on.
 
@@ -27,3 +27,7 @@ A compontent that will dynamically retreive the content of a state, pointed by t
 
 ### story-if
 A component that only display depending of the state, pointed by the `if` proprety.
+
+### examples
+
+You can find examples in the examples folder.
