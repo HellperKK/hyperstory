@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="../../engine.js" defer></script>
+    <script src="init.js" defer></script>
+    <link rel="stylesheet" href="../../style.css" />
+    <title>My Story</title>
+  </head>
+  <body>
+    <story-root>
+      <story-category name="Introduction">
+        <story-scene start page-id="1">
+          <p>Pick your name</p>
+          <story-input name="hero.name"></story-input>
+          <p>Pick your age</p>
+          <story-input name="hero.age" type="number"></story-input>
+          <story-choice to="2" onclick="$state.inventory.weapon = 'sword'">Continue</story-choice>
+        </story-scene>
+        <story-scene page-id="2">
+          You are <story-data name="hero.name"></story-data>, age of <story-data name="hero.age"></story-data> years old!
+          <story-choice to="1">Go back</story-choice>
+        </story-scene>
+      </story-category>
+    </story-root>
+  </body>
+</html>

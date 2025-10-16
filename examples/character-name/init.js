@@ -1,0 +1,1 @@
+$state.hero = {name: "Paul", age:42};
