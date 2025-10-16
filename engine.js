@@ -32,7 +32,6 @@ function set(obj, path, value) {
 
 function dig(obj, path) {
   const firstPass = /^[A-Za-z_0-9]+/;
-  console.log(obj, path);
 
   let result = obj;
   let newPath = path;
@@ -70,8 +69,6 @@ function dig(obj, path) {
     newPath = newPath.slice(full.length);
     results.unshift({ obj: result, path: newPath });
   }
-
-  console.log(results);
 
   return results;
 }
@@ -111,12 +108,10 @@ function makeHandler(object, root = []) {
       target[key] = value;
 
       const fullKey = buildKey(root.concat(key));
-      console.log("fullkey", fullKey)
-
+      
       for (const signal of signals) {
         if (signal.dependencies.some(key => key.startsWith(fullKey))) {
           const key = signal.dependencies.find(key => key.startsWith(fullKey))
-          console.log(key, fullKey, value);
           signal.callback(dig($state, key)[0].obj);
         }
       }
@@ -240,7 +235,6 @@ class EngineIf extends HTMLSpanElement {
   constructor() {
     super();
     const iff = this.getAttribute("if");
-    console.log(iff, $state[iff]);
     if (!$state[iff]) {
       this.classList.add("hidden");
     }
