@@ -6,27 +6,137 @@ const addSignal = (dependencies, callback) =>
 const addComputed = (dependencies, callback, name) =>
   computeds.push({ dependencies, callback, name });
 
-const $state = new Proxy(
-  {},
-  {
-    get: (target, key) => target[key] || "",
+const primitives = ["boolean", "number", "bigint", "string", "symbol", "function", "undefined"]
+const indexPass = /^\[(\d+)\]/;
+const propertyPass = /^\.([A-Za-z_0-9]+)/;
+
+function set(obj, path, value) {
+  const { obj: previousObject, path:previousPath } = dig[obj, path][1];
+  let index = null;
+  if (indexPass.test(previousPath)) {
+    const capture = indexPass.exec(previousPath);
+    index = parseInt(capture[1]);
+  }
+
+  if (propertyPass.test(previousPath)) {
+    const capture = propertyPass.exec(previousPath);
+    index = capture[1];
+  }
+
+  if (index === null) {
+    throw `invalid name ${previousPath}`;
+  }
+
+  obj[index] = value;
+}
+
+function dig(obj, path) {
+  const firstPass = /^[A-Za-z_0-9]+/;
+  console.log(obj, path);
+
+  let result = obj;
+  let newPath = path;
+  let results = [{ obj, path }];
+  if (!firstPass.test(newPath)) {
+    throw `invalid name ${newPath}`;
+  }
+
+  const firstProperty = firstPass.exec(path)[0];
+  result = result[firstProperty];
+  newPath = newPath.slice(firstProperty.length);
+  results.unshift({ obj: result, path: newPath });
+
+  while (newPath !== "") {
+    let index = null;
+    let full = null;
+
+    if (indexPass.test(newPath)) {
+      const capture = indexPass.exec(newPath);
+      full = capture[0];
+      index = parseInt(capture[1]);
+    }
+
+    if (propertyPass.test(newPath)) {
+      const capture = propertyPass.exec(newPath);
+      full = capture[0];
+      index = capture[1];
+    }
+
+    if (index === null) {
+      throw `invalid name ${newPath}`;
+    }
+
+    result = result[index];
+    newPath = newPath.slice(full.length);
+    results.unshift({ obj: result, path: newPath });
+  }
+
+  console.log(results);
+
+  return results;
+}
+
+function buildKey(keys) {
+  let res = keys.shift();
+
+  for (const key of keys) {
+    res += /^\d+$/.test(key) ? `[${key}]` : `.${key}`
+  }
+
+  return res;
+}
+
+const $state = makeHandler({});
+
+function makeHandler(object, root = []) {
+  const handler = {
+    get: (target, key) => {
+      const value = target[key];
+
+      if (primitives.includes(typeof value)) {
+        return value;
+      }
+
+      if (typeof value === "object") {
+        return makeHandler(value, root.concat(key));
+      }
+
+      if (Array.isArray(value)) {
+        return makeHandler(value, root.concat(key));
+      }
+
+      console.error("value type not managed", typeof value);
+    },
     set: (target, key, value) => {
       target[key] = value;
+
+      const fullKey = buildKey(root.concat(key));
+      console.log("fullkey", fullKey)
+
       for (const signal of signals) {
-        if (signal.dependencies.includes(key)) {
-          signal.callback(value);
+        if (signal.dependencies.some(key => key.startsWith(fullKey))) {
+          const key = signal.dependencies.find(key => key.startsWith(fullKey))
+          console.log(key, fullKey, value);
+          signal.callback(dig($state, key)[0].obj);
         }
       }
+
       for (const computed of computeds) {
-        if (computed.dependencies.includes(key)) {
-          const values = computed.dependencies.map((dep) => target[dep]);
+        if (computed.dependencies.some(key => key.startsWith(fullKey))) {
+          const values = computed.dependencies.map((dep) => dig($state, dep)[0].obj);
           $state[computed.name] = computed.callback(...values);
         }
       }
+
       return true;
     },
   }
-);
+
+  return new Proxy(
+    object,
+    handler
+  )
+}
 
 class EngineRoot extends HTMLDivElement {
   constructor() {
