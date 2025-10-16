@@ -1,0 +1,22 @@
+doctype
+html(lang="en")
+  head
+    script(src="../../engine.js" defer=true)
+    link(rel="stylesheet" href="../../style.css")
+  body
+    story-root
+      story-category(name="introduction")
+        story-scene(start page-id="1")
+          p what is your favorite dessert ?
+          story-choice(to="2") Cheesecake 
+          story-choice(to="3") Vamilla ice cream 
+          story-choice(to="4") Brownie 
+        story-scene(page-id="2")
+          p You chose the best dessert and desserve to be my friend!
+          story-choice(to="1") Go back 
+        story-scene(page-id="3")
+          p Quite classical I must say...
+          story-choice(to="1") Go back 
+        story-scene(page-id="4")
+          p I guess you're not counting your calories?
+          story-choice(to="1") Go back 
