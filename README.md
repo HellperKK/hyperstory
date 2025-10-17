@@ -28,6 +28,30 @@ A compontent that will dynamically retreive the content of a state, pointed by t
 ### story-if
 A component that only display depending of the state, pointed by the `if` proprety.
 
-### examples
+## code functionnnalities
+
+You have acces to a global constant `$state` of which you can mutate the properties to trigger some reactivity in the game.
+You can alose use two function to react to the changes made to `$state`:
+
+### addSignal(dependencies, callback)
+
+Will take an array and a callback and call the callback everytime a dependency has changed, passing the changed dependency to the callback.
+
+example:
+```js
+addSignal(["hero.name"], (name) => console.log(`hero name is now ${name}`))
+```
+
+### addComputed(dependencies, callback, name)
+
+Will take an array and a callback and call the callback everytime a dependency has changed, passing all the dépendencies to the callback.
+Whill store the result to the property `name`
+
+example:
+```js
+addComputed(["hero.firstName", "hero.lastName"], (firstName, lastName) => `${firstName} ${lastName}`, "hero.fullName")
+```
+
+## examples
 
 You can find examples in the examples folder.
