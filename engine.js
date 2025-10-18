@@ -7,11 +7,18 @@ const addComputed = (dependencies, callback, name) =>
   computeds.push({ dependencies, callback, name });
 
 const primitives = ["boolean", "number", "bigint", "string", "symbol", "function", "undefined"]
+const firstPass = /^[A-Za-z_0-9]+/;
 const indexPass = /^\[(\d+)\]/;
 const propertyPass = /^\.([A-Za-z_0-9]+)/;
 
 function set(obj, path, value) {
-  const { obj: previousObject, path:previousPath } = dig[obj, path][1];
+  const { obj: previousObject, path: previousPath } = dig(obj, path)[1];
+
+  if (/^[A-Za-z_0-9]+$/.test(previousPath)) {
+    previousObject[previousPath] = value;
+    return;
+  }
+
   let index = null;
   if (indexPass.test(previousPath)) {
     const capture = indexPass.exec(previousPath);
@@ -31,8 +38,6 @@ function set(obj, path, value) {
 }
 
 function dig(obj, path) {
-  const firstPass = /^[A-Za-z_0-9]+/;
-
   let result = obj;
   let newPath = path;
   let results = [{ obj, path }];
@@ -73,6 +78,10 @@ function dig(obj, path) {
   return results;
 }
 
+function digb(obj, path) {
+  return dig(obj, path)[0].obj;
+}
+
 function buildKey(keys) {
   let res = keys.shift();
 
@@ -83,7 +92,7 @@ function buildKey(keys) {
   return res;
 }
 
-const $state = makeHandler({});
+const $ = makeHandler({});
 
 function makeHandler(object, root = []) {
   const handler = {
@@ -108,18 +117,21 @@ function makeHandler(object, root = []) {
       target[key] = value;
 
       const fullKey = buildKey(root.concat(key));
+      console.log(fullKey);
       
+
       for (const signal of signals) {
         if (signal.dependencies.some(key => key.startsWith(fullKey))) {
+          console.log(signal.dependencies, fullKey);
           const key = signal.dependencies.find(key => key.startsWith(fullKey))
-          signal.callback(dig($state, key)[0].obj);
+          signal.callback(digb($, key));
         }
       }
 
       for (const computed of computeds) {
         if (computed.dependencies.some(key => key.startsWith(fullKey))) {
-          const values = computed.dependencies.map((dep) => dig($state, dep)[0].obj);
-          $state[computed.name] = computed.callback(...values);
+          const values = computed.dependencies.map((dep) => digb($, dep));
+          set($, computed.name, computed.callback(...values));
         }
       }
 
@@ -192,23 +204,6 @@ class EngineChoice extends HTMLButtonElement {
     this.innerText = "";
     button.innerText = text;
     this.appendChild(button);
-
-    const iff = this.getAttribute("if");
-    if (iff && !$state[iff]) {
-      this.classList.add("hidden");
-    }
-    if (iff) {
-      signals.push({
-        dependencies: [iff],
-        callback: (value) => {
-          if (value) {
-            this.classList.remove("hidden");
-          } else {
-            this.classList.add("hidden");
-          }
-        },
-      });
-    }
   }
 
   connect(callback) {
@@ -221,9 +216,11 @@ class EngineChoice extends HTMLButtonElement {
 class EngineData extends HTMLSpanElement {
   constructor() {
     super();
-    this.innerText = $state[this.getAttribute("name")];
+    const name = this.getAttribute("name");
+
+    this.innerText = digb($, name);
     signals.push({
-      dependencies: [this.getAttribute("name")],
+      dependencies: [name],
       callback: (value) => {
         this.innerText = value;
       },
@@ -235,7 +232,7 @@ class EngineIf extends HTMLSpanElement {
   constructor() {
     super();
     const iff = this.getAttribute("if");
-    if (!$state[iff]) {
+    if (!digb($, iff)) {
       this.classList.add("hidden");
     }
 
@@ -266,9 +263,11 @@ class EngineInput extends HTMLElement {
     this.input.placeholder = this.getAttribute("placeholder") ?? "";
 
     const name = this.getAttribute("name");
-    this.input.value = $state[name] ?? "";
+    this.input.value = digb($, name) ?? "";
+    console.log($, name, digb($, name))
     this.input.addEventListener("input", (event) => {
-      $state[name] = event.target.value;
+      console.log(name);
+      set($, name, event.target.value);
     });
 
     signals.push({
@@ -282,10 +281,12 @@ class EngineInput extends HTMLElement {
   }
 }
 
-customElements.define("story-input", EngineInput);
-customElements.define("story-if", EngineIf, { extends: "span" });
-customElements.define("story-data", EngineData, { extends: "span" });
-customElements.define("story-choice", EngineChoice, { extends: "button" });
-customElements.define("story-scene", EngineScene, { extends: "div" });
-customElements.define("story-category", EngineCategory, { extends: "div" });
-customElements.define("story-root", EngineRoot, { extends: "div" });
+document.addEventListener("DOMContentLoaded", () => {
+  customElements.define("story-input", EngineInput);
+  customElements.define("story-if", EngineIf, { extends: "span" });
+  customElements.define("story-data", EngineData, { extends: "span" });
+  customElements.define("story-choice", EngineChoice, { extends: "button" });
+  customElements.define("story-scene", EngineScene, { extends: "div" });
+  customElements.define("story-category", EngineCategory, { extends: "div" });
+  customElements.define("story-root", EngineRoot, { extends: "div" });
+})
