@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="../engine.js" defer></script>
+    <script src="../engine.js"></script>
     <link rel="stylesheet" href="../style.css" />
     <title>My Story</title>
   </head>
@@ -11,13 +11,12 @@
     <story-root>
       <story-category name="Introduction">
         <story-scene start page-id="1">
-          What is your name? <story-input name="name"></story-input>
-          <br>
+          <p>What is your name? <story-input name="name"></story-input></p>
+          <p>What is your name? <story-input name="name"></story-input></p>
           <story-choice to="2" if="name">Greet</story-choice>
         </story-scene>
         <story-scene page-id="2">
-          Hello <story-data name="name"></story-data>!
-          <br>
+          <p>Hello <story-data name="name"></story-data>!</p>
           <story-choice to="1">Go back</story-choice>
         </story-scene>
       </story-category>

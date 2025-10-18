@@ -1,4 +1,4 @@
-$state.inventory = {weapon: null};
+$.inventory = {weapon: null};
 addComputed(["inventory.weapon"], (equipement) => {
     return equipement === "sword"
 }, "isRight");

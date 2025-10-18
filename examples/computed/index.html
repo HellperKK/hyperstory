@@ -1,33 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="../../engine.js" defer></script>
-    <script src="init.js" defer></script>
-    <link rel="stylesheet" href="../../style.css" />
-    <title>My Story</title>
-  </head>
-  <body>
-    <story-root>
-      <story-category name="Introduction">
-        <story-scene start page-id="1">
-          Choose a number <story-input type="number" name="number"></story-input>
-          <br>
-          <story-choice to="2">Pick</story-choice>
-          <story-choice to="3" if="isNumberRight">Secret passage!</story-choice>
-        </story-scene>
-        <story-scene page-id="2">
-          You chose <story-data name="number"></story-data>!
-          <br>
-          <story-choice to="1">Go back</story-choice>
-        </story-scene>
-        <story-scene page-id="3">
-          Congrats !
-          <br>
-          <story-choice to="1">Go back</story-choice>
-        </story-scene>
-      </story-category>
-    </story-root>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../engine.js"></script>
+  <script src="init.js"></script>
+  <link rel="stylesheet" href="../../style.css" />
+  <title>My Story</title>
+</head>
+
+<body>
+  <story-root>
+    <story-category name="Introduction">
+      <story-scene start page-id="1">
+        Choose a number <story-input type="number" name="number"></story-input>
+        <br>
+        <story-choice to="2">Pick</story-choice>
+        <story-if if="isNumberRight">
+          <story-choice to="3">Secret passage!</story-choice>
+        </story-if>
+      </story-scene>
+      <story-scene page-id="2">
+        You chose <story-data name="number"></story-data>!
+        <br>
+        <story-choice to="1">Go back</story-choice>
+      </story-scene>
+      <story-scene page-id="3">
+        Congrats !
+        <br>
+        <story-choice to="1">Go back</story-choice>
+      </story-scene>
+    </story-category>
+  </story-root>
+</body>
+
 </html>

@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="../../engine.js" defer></script>
-    <script src="init.js" defer></script>
+    <script src="../../engine.js"></script>
+    <script src="init.js"></script>
     <link rel="stylesheet" href="../../style.css" />
     <title>My Story</title>
   </head>
@@ -13,8 +13,8 @@
       <story-category name="Introduction">
         <story-scene start page-id="1">
           <p>Pick a weapon</p>
-          <story-choice to="2" onclick="$state.inventory[0] = 'sword'">Sword</story-choice>
-          <story-choice to="2" onclick="$state.inventory[0] = 'mace'">Mace</story-choice>
+          <story-choice to="2" onclick="$.inventory[0] = 'sword'">Sword</story-choice>
+          <story-choice to="2" onclick="$.inventory[0] = 'mace'">Mace</story-choice>
         </story-scene>
         <story-scene page-id="2">
           You chose <story-data name="inventory[0]"></story-data>!

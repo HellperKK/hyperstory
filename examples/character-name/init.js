@@ -1,1 +1,1 @@
-$state.hero = {name: "Paul", age:42};
+$.hero = {name: "Paul", age:42};
