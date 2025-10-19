@@ -13,7 +13,6 @@ const propertyPass = /^\.([A-Za-z_0-9]+)/;
 
 function set(obj, path, value) {
   const { obj: previousObject, path: previousPath } = dig(obj, path)[1];
-  console.log(previousObject, previousPath)
 
   let index = null;
   if (indexPass.test(previousPath)) {
