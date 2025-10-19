@@ -117,12 +117,9 @@ function makeHandler(object, root = []) {
       target[key] = value;
 
       const fullKey = buildKey(root.concat(key));
-      console.log(fullKey);
-      
 
       for (const signal of signals) {
         if (signal.dependencies.some(key => key.startsWith(fullKey))) {
-          console.log(signal.dependencies, fullKey);
           const key = signal.dependencies.find(key => key.startsWith(fullKey))
           signal.callback(digb($, key));
         }
@@ -264,9 +261,7 @@ class EngineInput extends HTMLElement {
 
     const name = this.getAttribute("name");
     this.input.value = digb($, name) ?? "";
-    console.log($, name, digb($, name))
     this.input.addEventListener("input", (event) => {
-      console.log(name);
       set($, name, event.target.value);
     });
 
