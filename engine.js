@@ -34,7 +34,7 @@ function set(obj, path, value) {
     throw `invalid name ${previousPath}`;
   }
 
-  obj[index] = value;
+  previousObject[index] = value;
 }
 
 function dig(obj, path) {
