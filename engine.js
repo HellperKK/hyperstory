@@ -99,19 +99,10 @@ function makeHandler(object, root = []) {
     get: (target, key) => {
       const value = target[key];
 
-      if (primitives.includes(typeof value)) {
+      if (primitives.includes(typeof value) || value === null) {
         return value;
       }
-
-      if (typeof value === "object") {
-        return makeHandler(value, root.concat(key));
-      }
-
-      if (Array.isArray(value)) {
-        return makeHandler(value, root.concat(key));
-      }
-
-      console.error("value type not managed", typeof value);
+      return makeHandler(value, root.concat(key));
     },
     set: (target, key, value) => {
       target[key] = value;
