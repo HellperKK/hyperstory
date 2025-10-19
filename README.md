@@ -30,8 +30,8 @@ A component that only display depending of the state, pointed by the `if` propre
 
 ## code functionnnalities
 
-You have acces to a global constant `$state` of which you can mutate the properties to trigger some reactivity in the game.
-You can alose use two function to react to the changes made to `$state`:
+You have acces to a global constant `$` of which you can mutate the properties to trigger some reactivity in the game.
+You can alose use two function to react to the changes made to `$`:
 
 ### addSignal(dependencies, callback)
 
