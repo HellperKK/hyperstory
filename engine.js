@@ -79,8 +79,6 @@ function buildKey(keys) {
   return res;
 }
 
-const $ = makeHandler({});
-
 function makeHandler(object, root = []) {
   const handler = {
     get: (target, key) => {
@@ -119,6 +117,8 @@ function makeHandler(object, root = []) {
     handler
   )
 }
+
+const $ = makeHandler({});
 
 class EngineRoot extends HTMLDivElement {
   constructor() {
