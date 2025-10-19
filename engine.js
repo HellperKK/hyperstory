@@ -174,12 +174,6 @@ class EngineScene extends HTMLDivElement {
 class EngineChoice extends HTMLButtonElement {
   constructor() {
     super();
-
-    const button = document.createElement("button");
-    const text = this.innerText;
-    this.innerText = "";
-    button.innerText = text;
-    this.appendChild(button);
   }
 
   connect(callback) {
@@ -187,11 +181,21 @@ class EngineChoice extends HTMLButtonElement {
       callback(this.getAttribute("to"));
     });
   }
+
+  connectedCallback() {
+    const button = document.createElement("button");
+    const text = this.innerText;
+    this.innerText = "";
+    button.innerText = text;
+    this.appendChild(button);
+  }
 }
 
 class EngineData extends HTMLSpanElement {
   constructor() {
     super();
+  }
+  connectedCallback() {
     const name = this.getAttribute("name");
 
     this.innerText = digb($, name);
@@ -207,6 +211,8 @@ class EngineData extends HTMLSpanElement {
 class EngineIf extends HTMLSpanElement {
   constructor() {
     super();
+  }
+  connectedCallback() {
     const iff = this.getAttribute("if");
     if (!digb($, iff)) {
       this.classList.add("hidden");
@@ -234,6 +240,8 @@ class EngineCategory extends HTMLDivElement {
 class EngineInput extends HTMLElement {
   constructor() {
     super();
+  }
+  connectedCallback() {
     this.input = document.createElement("input");
     this.input.type = this.getAttribute("type");
     this.input.placeholder = this.getAttribute("placeholder") ?? "";
