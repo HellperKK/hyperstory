@@ -13,11 +13,7 @@ const propertyPass = /^\.([A-Za-z_0-9]+)/;
 
 function set(obj, path, value) {
   const { obj: previousObject, path: previousPath } = dig(obj, path)[1];
-
-  if (/^[A-Za-z_0-9]+$/.test(previousPath)) {
-    previousObject[previousPath] = value;
-    return;
-  }
+  console.log(previousObject, previousPath)
 
   let index = null;
   if (indexPass.test(previousPath)) {
@@ -39,16 +35,8 @@ function set(obj, path, value) {
 
 function dig(obj, path) {
   let result = obj;
-  let newPath = path;
-  let results = [{ obj, path }];
-  if (!firstPass.test(newPath)) {
-    throw `invalid name ${newPath}`;
-  }
-
-  const firstProperty = firstPass.exec(path)[0];
-  result = result[firstProperty];
-  newPath = newPath.slice(firstProperty.length);
-  results.unshift({ obj: result, path: newPath });
+  let newPath = `.${path}`;
+  let results = [{ obj: result, path: newPath }];
 
   while (newPath !== "") {
     let index = null;
