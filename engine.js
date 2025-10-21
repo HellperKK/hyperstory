@@ -1,10 +1,13 @@
 const signals = [];
 const computeds = [];
+const events = []
 
 const addSignal = (dependencies, callback) =>
-  signals.push({ dependencies, callback });
+    signals.push({ dependencies, callback });
 const addComputed = (dependencies, callback, name) =>
-  computeds.push({ dependencies, callback, name });
+    computeds.push({ dependencies, callback, name });
+const addEvent = (condition, callback) =>
+    events.push({ condition, callback });
 
 const primitives = ["boolean", "number", "bigint", "string", "symbol", "function", "undefined"]
 const firstPass = /^[A-Za-z_0-9]+/;
@@ -12,262 +15,268 @@ const indexPass = /^\[(\d+)\]/;
 const propertyPass = /^\.([A-Za-z_0-9]+)/;
 
 function set(obj, path, value) {
-  const { obj: previousObject, path: previousPath } = dig(obj, path)[1];
+    const { obj: previousObject, path: previousPath } = dig(obj, path)[1];
 
-  let index = null;
-  if (indexPass.test(previousPath)) {
-    const capture = indexPass.exec(previousPath);
-    index = parseInt(capture[1]);
-  }
-
-  if (propertyPass.test(previousPath)) {
-    const capture = propertyPass.exec(previousPath);
-    index = capture[1];
-  }
-
-  if (index === null) {
-    throw `invalid name ${previousPath}`;
-  }
-
-  previousObject[index] = value;
-}
-
-function dig(obj, path) {
-  let result = obj;
-  let newPath = `.${path}`;
-  let results = [{ obj: result, path: newPath }];
-
-  while (newPath !== "") {
     let index = null;
-    let full = null;
-
-    if (indexPass.test(newPath)) {
-      const capture = indexPass.exec(newPath);
-      full = capture[0];
-      index = parseInt(capture[1]);
+    if (indexPass.test(previousPath)) {
+        const capture = indexPass.exec(previousPath);
+        index = parseInt(capture[1]);
     }
 
-    if (propertyPass.test(newPath)) {
-      const capture = propertyPass.exec(newPath);
-      full = capture[0];
-      index = capture[1];
+    if (propertyPass.test(previousPath)) {
+        const capture = propertyPass.exec(previousPath);
+        index = capture[1];
     }
 
     if (index === null) {
-      throw `invalid name ${newPath}`;
+        throw `invalid name ${previousPath}`;
     }
 
-    result = result[index];
-    newPath = newPath.slice(full.length);
-    results.unshift({ obj: result, path: newPath });
-  }
+    previousObject[index] = value;
+}
 
-  return results;
+function dig(obj, path) {
+    let result = obj;
+    let newPath = `.${path}`;
+    let results = [{ obj: result, path: newPath }];
+
+    while (newPath !== "") {
+        let index = null;
+        let full = null;
+
+        if (indexPass.test(newPath)) {
+            const capture = indexPass.exec(newPath);
+            full = capture[0];
+            index = parseInt(capture[1]);
+        }
+
+        if (propertyPass.test(newPath)) {
+            const capture = propertyPass.exec(newPath);
+            full = capture[0];
+            index = capture[1];
+        }
+
+        if (index === null) {
+            throw `invalid name ${newPath}`;
+        }
+
+        result = result[index];
+        newPath = newPath.slice(full.length);
+        results.unshift({ obj: result, path: newPath });
+    }
+
+    return results;
 }
 
 function digb(obj, path) {
-  return dig(obj, path)[0].obj;
+    return dig(obj, path)[0].obj;
 }
 
 function buildKey(keys) {
-  let res = keys.shift();
+    let res = keys.shift();
 
-  for (const key of keys) {
-    res += /^\d+$/.test(key) ? `[${key}]` : `.${key}`
-  }
+    for (const key of keys) {
+        res += /^\d+$/.test(key) ? `[${key}]` : `.${key}`
+    }
 
-  return res;
+    return res;
 }
 
 function makeHandler(object, root = []) {
-  const handler = {
-    get: (target, key) => {
-      const value = target[key];
+    const handler = {
+        get: (target, key) => {
+            const value = target[key];
 
-      if (primitives.includes(typeof value) || value === null) {
-        return value;
-      }
-      return makeHandler(value, root.concat(key));
-    },
-    set: (target, key, value) => {
-      target[key] = value;
+            if (primitives.includes(typeof value) || value === null) {
+                return value;
+            }
+            return makeHandler(value, root.concat(key));
+        },
+        set: (target, key, value) => {
+            target[key] = value;
 
-      const fullKey = buildKey(root.concat(key));
+            const fullKey = buildKey(root.concat(key));
 
-      for (const signal of signals) {
-        if (signal.dependencies.some(key => key.startsWith(fullKey))) {
-          const key = signal.dependencies.find(key => key.startsWith(fullKey))
-          signal.callback(digb($, key));
-        }
-      }
+            for (const signal of signals) {
+                if (signal.dependencies.some(key => key.startsWith(fullKey))) {
+                    const key = signal.dependencies.find(key => key.startsWith(fullKey))
+                    signal.callback(digb($, key));
+                }
+            }
 
-      for (const computed of computeds) {
-        if (computed.dependencies.some(key => key.startsWith(fullKey))) {
-          const values = computed.dependencies.map((dep) => digb($, dep));
-          set($, computed.name, computed.callback(...values));
-        }
-      }
+            for (const computed of computeds) {
+                if (computed.dependencies.some(key => key.startsWith(fullKey))) {
+                    const values = computed.dependencies.map((dep) => digb($, dep));
+                    set($, computed.name, computed.callback(...values));
+                }
+            }
 
-      return true;
-    },
-  }
+            return true;
+        },
+    }
 
-  return new Proxy(
-    object,
-    handler
-  )
+    return new Proxy(
+        object,
+        handler
+    )
 }
 
 const $ = makeHandler({});
 
 class EngineRoot extends HTMLDivElement {
-  constructor() {
-    super();
+    constructor() {
+        super();
 
-    this.startPage = this.querySelector("story-scene[start]");
-    this.startPage.activate();
-    this.currentPage = this.startPage;
+        this.startPage = this.querySelector("story-scene[start]");
+        this.startPage.activate();
+        this.currentPage = this.startPage;
 
-    this.allPages = this.querySelectorAll("story-scene");
-    this.allPages.forEach((page) => {
-      page.connect((id) => {
-        this.next(id);
-      });
-    });
-  }
-
-  next(id) {
-    const nextPage = this.querySelector(`story-scene[page-id="${id}"]`);
-
-    if (!nextPage) {
-      console.error(`No page with id ${id}`);
-      return;
+        this.allPages = this.querySelectorAll("story-scene");
+        this.allPages.forEach((page) => {
+            page.connect((id) => {
+                this.next(id);
+            });
+        });
     }
 
-    this.currentPage.deactivate();
-    nextPage.activate();
-    this.currentPage = nextPage;
-  }
+    next(id) {
+        const nextPage = this.querySelector(`story-scene[page-id="${id}"]`);
+
+        if (!nextPage) {
+            console.error(`No page with id ${id}`);
+            return;
+        }
+
+        this.currentPage.deactivate();
+        nextPage.activate();
+        this.currentPage = nextPage;
+
+        for (const event of events) {
+            if (event.condition()) {
+                event.callback(id, this)
+            }
+        }
+    }
 }
 
 class EngineScene extends HTMLDivElement {
-  constructor() {
-    super();
-  }
+    constructor() {
+        super();
+    }
 
-  activate() {
-    this.classList.add("active");
-  }
+    activate() {
+        this.classList.add("active");
+    }
 
-  deactivate() {
-    this.classList.remove("active");
-  }
+    deactivate() {
+        this.classList.remove("active");
+    }
 
-  connect(callback) {
-    this.querySelectorAll("story-choice").forEach((link) => {
-      link.connect(callback);
-    });
-  }
+    connect(callback) {
+        this.querySelectorAll("story-choice").forEach((link) => {
+            link.connect(callback);
+        });
+    }
 }
 
 class EngineChoice extends HTMLButtonElement {
-  constructor() {
-    super();
-  }
+    constructor() {
+        super();
+    }
 
-  connect(callback) {
-    this.addEventListener("click", () => {
-      callback(this.getAttribute("to"));
-    });
-  }
+    connect(callback) {
+        this.addEventListener("click", () => {
+            callback(this.getAttribute("to"));
+        });
+    }
 
-  connectedCallback() {
-    const button = document.createElement("button");
-    const text = this.innerText;
-    this.innerText = "";
-    button.innerText = text;
-    this.appendChild(button);
-  }
+    connectedCallback() {
+        const button = document.createElement("button");
+        const text = this.innerText;
+        this.innerText = "";
+        button.innerText = text;
+        this.appendChild(button);
+    }
 }
 
 class EngineData extends HTMLSpanElement {
-  constructor() {
-    super();
-  }
-  connectedCallback() {
-    const name = this.getAttribute("name");
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        const name = this.getAttribute("name");
 
-    this.innerText = digb($, name);
-    signals.push({
-      dependencies: [name],
-      callback: (value) => {
-        this.innerText = value;
-      },
-    });
-  }
+        this.innerText = digb($, name);
+        signals.push({
+            dependencies: [name],
+            callback: (value) => {
+                this.innerText = value;
+            },
+        });
+    }
 }
 
 class EngineIf extends HTMLSpanElement {
-  constructor() {
-    super();
-  }
-  connectedCallback() {
-    const iff = this.getAttribute("if");
-    if (!digb($, iff)) {
-      this.classList.add("hidden");
+    constructor() {
+        super();
     }
-
-    signals.push({
-      dependencies: [iff],
-      callback: (value) => {
-        if (value) {
-          this.classList.remove("hidden");
-        } else {
-          this.classList.add("hidden");
+    connectedCallback() {
+        const iff = this.getAttribute("if");
+        if (!digb($, iff)) {
+            this.classList.add("hidden");
         }
-      },
-    });
-  }
+
+        signals.push({
+            dependencies: [iff],
+            callback: (value) => {
+                if (value) {
+                    this.classList.remove("hidden");
+                } else {
+                    this.classList.add("hidden");
+                }
+            },
+        });
+    }
 }
 
 class EngineCategory extends HTMLDivElement {
-  constructor() {
-    super();
-  }
+    constructor() {
+        super();
+    }
 }
 
 class EngineInput extends HTMLElement {
-  constructor() {
-    super();
-  }
-  connectedCallback() {
-    this.input = document.createElement("input");
-    this.input.type = this.getAttribute("type");
-    this.input.placeholder = this.getAttribute("placeholder") ?? "";
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        this.input = document.createElement("input");
+        this.input.type = this.getAttribute("type");
+        this.input.placeholder = this.getAttribute("placeholder") ?? "";
 
-    const name = this.getAttribute("name");
-    this.input.value = digb($, name) ?? "";
-    this.input.addEventListener("input", (event) => {
-      set($, name, event.target.value);
-    });
+        const name = this.getAttribute("name");
+        this.input.value = digb($, name) ?? "";
+        this.input.addEventListener("input", (event) => {
+            set($, name, event.target.value);
+        });
 
-    signals.push({
-      dependencies: [name],
-      callback: (value) => {
-        this.input.value = value;
-      },
-    });
+        signals.push({
+            dependencies: [name],
+            callback: (value) => {
+                this.input.value = value;
+            },
+        });
 
-    this.appendChild(this.input);
-  }
+        this.appendChild(this.input);
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  customElements.define("story-input", EngineInput);
-  customElements.define("story-if", EngineIf, { extends: "span" });
-  customElements.define("story-data", EngineData, { extends: "span" });
-  customElements.define("story-choice", EngineChoice, { extends: "button" });
-  customElements.define("story-scene", EngineScene, { extends: "div" });
-  customElements.define("story-category", EngineCategory, { extends: "div" });
-  customElements.define("story-root", EngineRoot, { extends: "div" });
+    customElements.define("story-input", EngineInput);
+    customElements.define("story-if", EngineIf, { extends: "span" });
+    customElements.define("story-data", EngineData, { extends: "span" });
+    customElements.define("story-choice", EngineChoice, { extends: "button" });
+    customElements.define("story-scene", EngineScene, { extends: "div" });
+    customElements.define("story-category", EngineCategory, { extends: "div" });
+    customElements.define("story-root", EngineRoot, { extends: "div" });
 })

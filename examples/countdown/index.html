@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../engine.js"></script>
+  <script src="init.js"></script>
+  <link rel="stylesheet" href="../../style.css" />
+  <title>My Story</title>
+</head>
+
+<body>
+  <story-root>
+    <story-category name="Introduction">
+      <story-scene start page-id="1">
+        <p>You must give tyhe code or we will die in <story-data name="count"></story-input> minutes!</p>
+        <story-choice to="1">Refuse</story-choice>
+        <story-choice to="2" onclick="$.exited = true">Give</story-choice>
+      </story-scene>
+      <story-scene page-id="2">
+        <p>You are now safe.</p>
+        <story-choice to="1" onclick="$.exited = false; $.count = 5">Go back</story-choice>
+      </story-scene>
+      <story-scene page-id="gameover">
+        <p>You are dead</p>
+        <story-choice to="1" onclick="$.count = 5">Go back</story-choice>
+      </story-scene>
+    </story-category>
+  </story-root>
+</body>
+
+</html>
