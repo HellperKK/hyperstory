@@ -271,24 +271,24 @@ class EngineInput extends HTMLElement {
         super();
     }
     connectedCallback() {
-        this.input = document.createElement("input");
-        this.input.type = this.getAttribute("type");
-        this.input.placeholder = this.getAttribute("placeholder") ?? "";
+        const input = document.createElement("input");
+        input.type = this.getAttribute("type");
+        input.placeholder = this.getAttribute("placeholder") ?? "";
 
         const name = this.getAttribute("name");
-        this.input.value = digb($, name) ?? "";
-        this.input.addEventListener("input", (event) => {
+        input.value = digb($, name) ?? "";
+        input.addEventListener("input", (event) => {
             set($, name, event.target.value);
         });
 
         signals.push({
             dependencies: [name],
             callback: (value) => {
-                this.input.value = value;
+                input.value = value;
             },
         });
 
-        this.appendChild(this.input);
+        this.appendChild(input);
     }
 }
 
