@@ -1,6 +1,7 @@
 const signals = [];
 const computeds = [];
 const events = []
+let saveName = "save";
 
 const addSignal = (dependencies, callback) =>
     signals.push({ dependencies, callback });
@@ -85,6 +86,10 @@ function buildKey(keys) {
 function makeHandler(object, root = []) {
     const handler = {
         get: (target, key) => {
+            if (key === "toJson") {
+                return () => target;
+            }
+
             const value = target[key];
 
             if (primitives.includes(typeof value) || value === null) {
@@ -121,15 +126,28 @@ function makeHandler(object, root = []) {
     )
 }
 
-const $ = makeHandler({});
+let $ = makeHandler({});
+let game;
 
+function save() {
+    localStorage.setItem(saveName, JSON.stringify({ state: $, pageId: game.id }))
+}
+function load() {
+    const data = JSON.parse(localStorage.getItem(saveName))
+    $ = makeHandler({});
+    Object.assign($, data.state)
+    game.next(data.pageId, false)
+}
 class EngineRoot extends HTMLDivElement {
     constructor() {
         super();
-
+    }
+    connectedCallback() {
+        game = this;
         this.startPage = this.querySelector("story-scene[start]");
         this.startPage.activate();
         this.currentPage = this.startPage;
+        this.id = this.currentPage.getAttribute("pageid");
 
         this.allPages = this.querySelectorAll("story-scene");
         this.allPages.forEach((page) => {
@@ -139,7 +157,8 @@ class EngineRoot extends HTMLDivElement {
         });
     }
 
-    next(id) {
+    next(id, trigger = true) {
+        this.id = id;
         const nextPage = this.querySelector(`story-scene[page-id="${id}"]`);
 
         if (!nextPage) {
@@ -151,9 +170,11 @@ class EngineRoot extends HTMLDivElement {
         nextPage.activate();
         this.currentPage = nextPage;
 
-        for (const event of events) {
-            if (event.condition()) {
-                event.callback(id, this)
+        if (trigger) {
+            for (const event of events) {
+                if (event.condition()) {
+                    event.callback(id, this)
+                }
             }
         }
     }
