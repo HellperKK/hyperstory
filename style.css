@@ -1,7 +1,3 @@
-:root {
-  --bg-color: #d5d5d5;
-}
-
 body {
   margin: 0;
 }
@@ -21,7 +17,7 @@ story-scene {
   display: none;
   flex-direction: column;
   align-items: center;
-  background-color: var(--bg-color);
+  background-color: #d5d5d5;
 }
 
 story-scene.active {
