@@ -1,7 +1,6 @@
 const signals = [];
 const computeds = [];
 const events = []
-let saveName = "save";
 
 const addSignal = (dependencies, callback) =>
     signals.push({ dependencies, callback });
@@ -43,30 +42,25 @@ class ERoot extends HTMLDivElement {
     }
     connectedCallback() {
         game = this;
-        this.startPage = this.querySelector("story-scene[start]");
-        this.startPage.activate();
-        this.currentPage = this.startPage;
+        this.currentPage = this.querySelector("story-scene[start]");
+        this.currentPage.activate();
         this.id = this.currentPage.getAttribute("pageid");
 
-        this.allPages = this.querySelectorAll("story-scene");
-        this.allPages.forEach((page) => {
-            page.connect((id) => {
-                this.next(id);
-            });
+        this.querySelectorAll("story-scene").forEach((page) => {
+            page.connect((id) => this.next(id))
         });
     }
 
     next(id, trigger = true) {
-        this.id = id;
         const nextPage = this.querySelector(`story-scene[page-id="${id}"]`);
 
         if (!nextPage) {
-            console.error(`No page with id ${id}`);
+            alert(`No page with id ${id}`);
             return;
         }
 
-        this.currentPage.deactivate();
-        nextPage.activate();
+        this.currentPage.setActive(false);
+        nextPage.setActive(true);
         this.currentPage = nextPage;
 
         if (trigger) {
@@ -84,12 +78,8 @@ class EScene extends HTMLDivElement {
         super();
     }
 
-    activate() {
-        this.classList.add("active");
-    }
-
-    deactivate() {
-        this.classList.remove("active");
+    setActive(flag) {
+        this.classList.toggle("active", flag);
     }
 
     connect(callback) {
@@ -105,16 +95,13 @@ class EChoice extends HTMLButtonElement {
     }
 
     connect(callback) {
-        this.addEventListener("click", () => {
-            callback(this.getAttribute("to"));
-        });
+        this.onclick = () => callback(this.getAttribute("to"));
     }
 
     connectedCallback() {
         const button = document.createElement("button");
-        const text = this.innerText;
+        button.innerText = this.innerText;
         this.innerText = "";
-        button.innerText = text;
         this.appendChild(button);
     }
 }
@@ -141,25 +128,13 @@ class EIf extends HTMLSpanElement {
     }
     connectedCallback() {
         const iff = this.getAttribute("if");
-        if (!$[iff]) {
-            this.classList.add("hidden");
-        }
+        this.classList.toggle("hidden", $[iff]);
 
         addSignal([iff],
             (value) => {
-                if (value) {
-                    this.classList.remove("hidden");
-                } else {
-                    this.classList.add("hidden");
-                }
+                this.classList.toggle("hidden", value)
             },
         );
-    }
-}
-
-class ECategory extends HTMLDivElement {
-    constructor() {
-        super();
     }
 }
 
@@ -174,9 +149,7 @@ class EInput extends HTMLElement {
 
         const name = this.getAttribute("name");
         input.value = $[name];
-        input.addEventListener("input", (event) => {
-            set($, name, event.target.value);
-        });
+        input.oninput = (event) => set($, name, event.target.value);
 
         addSignal([name],
             (value) => {
@@ -195,6 +168,5 @@ document.addEventListener("DOMContentLoaded", () => {
     c.define("s-data", EData, { extends: "span" });
     c.define("s-choice", EChoice, { extends: "button" });
     c.define("s-scene", EScene, { extends: "div" });
-    c.define("s-category", ECategory, { extends: "div" });
     c.define("s-root", ERoot, { extends: "div" });
 })
