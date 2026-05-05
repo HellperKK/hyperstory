@@ -28,6 +28,9 @@ A compontent that will dynamically retreive the content of a state, pointed by t
 ### story-if
 A component that only displays depending of the state, pointed by the `if` proprety.
 
+### story-dialogue
+A component that display a dialogue box, with the property `speaker` of the name of the perso speaking.
+
 ## code functionnnalities
 
 You have acces to a global constant `$` of which you can mutate the properties to trigger some reactivity in the game.
@@ -50,6 +53,24 @@ Whill store the result to the property `name`
 example:
 ```js
 addComputed(["hero.firstName", "hero.lastName"], (firstName, lastName) => `${firstName} ${lastName}`, "hero.fullName")
+```
+
+
+### addComputed(condition, callback)
+
+Takes two callbacks, the first one with no parameters returns a boolean to tell if the event is active and a second one that will be called, at each page change, if the event is active, taking in parameters the id of the next page and the game object.
+
+example:
+```js
+$.count = 5;
+$.exited = false;
+addEvent(() => !$.exited, (id, game) => {
+    $.count--;
+
+    if ($.count == 0) {
+        game.next("gameover");// redirects to a different page
+    }
+})
 ```
 
 ## examples
