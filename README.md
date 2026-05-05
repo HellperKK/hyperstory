@@ -26,7 +26,7 @@ A special input that will save its content inside a state, pointed by the `name`
 A compontent that will dynamically retreive the content of a state, pointed by the `name` property.
 
 ### story-if
-A component that only display depending of the state, pointed by the `if` proprety.
+A component that only displays depending of the state, pointed by the `if` proprety.
 
 ## code functionnnalities
 
