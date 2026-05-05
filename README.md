@@ -56,7 +56,7 @@ addComputed(["hero.firstName", "hero.lastName"], (firstName, lastName) => `${fir
 ```
 
 
-### addComputed(condition, callback)
+### addEvent(condition, callback)
 
 Takes two callbacks, the first one with no parameters returns a boolean to tell if the event is active and a second one that will be called, at each page change, if the event is active, taking in parameters the id of the next page and the game object.
 
